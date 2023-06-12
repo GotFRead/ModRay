@@ -1,5 +1,6 @@
 import json
 from fuzzywuzzy import fuzz
+from transliterate.decorators import transliterate_function
 
 class Service:
     Services_message = {
@@ -11,8 +12,13 @@ class Service:
     def __init__(self, request, params) -> None:
         self.config = config['autoanswer']
         self.accuracy = 80 if 'accuracy' not in params else params['accuracy']
-        self.request = request
+        self.request = self.translit(request)
 
+
+    @transliterate_function(language_code='ru', reversed=True)
+    def translit(self, text):
+        return text
+    
     def get_answer(self):
         list_results = list()
         for request_from_config in self.config:
@@ -33,7 +39,7 @@ class Service:
             count +=1
 
 
-def get_config(path_to_config = r'C:\Users\Aleksey ^_^\Desktop\ModRay\ModRay\mod_ray\configs\a2q.ini'):
+def get_config(path_to_config = r'C:\Users\Aleksey ^_^\Desktop\ModRay\ModRay\mod_ray\configs\a2q.json'):
     with open(path_to_config, 'r') as save:
         config = json.load(save)
         if config is not None:
